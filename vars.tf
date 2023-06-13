@@ -24,10 +24,18 @@ variable "AMIS"{
     }
 }
 
-variable "AMAZONLINUXUSER" {
+variable "AMAZONLINUX_USER" {
   default = "ec2-user"
 }
 
-variable "UBUNTUUSER"{
+variable "UBUNTU_USER"{
     default ="ubuntu"
+}
+
+variable "PRIVATE_KEY"{
+    default = "demoec2keypair"
+}
+
+variable "MY_IP"{
+    default = "174.94.0.224/32"
 }
