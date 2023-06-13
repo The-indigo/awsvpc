@@ -32,7 +32,6 @@ resource "aws_subnet" "summersPrivateSubnet1" {
   vpc_id     = aws_vpc.summersVpc.id
   cidr_block = "172.22.3.0/24"
   availability_zone = var.ZONE1
-
   tags = {
     Name = "Private subnet 1 of 2"
   }
