@@ -51,11 +51,11 @@ resource "aws_internet_gateway" "summersVpcIG" {
   vpc_id = aws_vpc.summersVpc.id
 }
 
-resource "aws_route_table" "summersRouteTable" {
+resource "aws_route_table" "summersPubRouteTable" {
   vpc_id = aws_vpc.summersVpc.id
 
   route {
-    cidr_block = "0.0.0.0/24"
+    cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.summersVpcIG.id
   }
 
@@ -64,12 +64,52 @@ resource "aws_route_table" "summersRouteTable" {
   }
 }
 
+
 resource "aws_route_table_association" "summersPubSubAssoc1" {
   subnet_id      = aws_subnet.summersPubSub1.id
-  route_table_id = aws_route_table.summersRouteTable.id
+  route_table_id = aws_route_table.summersPubRouteTable.id
 }
 
 resource "aws_route_table_association" "summersPubSubAssoc2" {
   subnet_id      = aws_subnet.summersPubSub2.id
-  route_table_id = aws_route_table.summersRouteTable.id
+  route_table_id = aws_route_table.summersPubRouteTable.id
+}
+
+resource "aws_eip" "summersEip" {
+  domain   = "vpc"
+   depends_on = [aws_internet_gateway.summersVpcIG]
+}
+
+
+resource "aws_nat_gateway" "summersNg" {
+  allocation_id = aws_eip.summersEip.id
+  subnet_id     = aws_subnet.summersPubSub1.id
+
+
+  # To ensure proper ordering, it is recommended to add an explicit dependency
+  # on the Internet Gateway for the VPC.
+  depends_on = [aws_internet_gateway.summersVpcIG]
+}
+
+resource "aws_route_table" "summersPrivRouteTable" {
+  vpc_id = aws_vpc.summersVpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.summersNg.id
+  }
+
+  tags = {
+    Name = "Summers private subnet route table"
+  }
+}
+
+resource "aws_route_table_association" "summersPrivSubAssoc1" {
+  subnet_id      = aws_subnet.summersPrivSub1.id
+  route_table_id = aws_route_table.summersPrivRouteTable.id
+}
+
+resource "aws_route_table_association" "summersPubSubAssoc2" {
+  subnet_id      = aws_subnet.summersPrivSub2.id
+  route_table_id = aws_route_table.summersPrivRouteTable.id
 }

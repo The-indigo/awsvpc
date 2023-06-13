@@ -1,15 +1,14 @@
-resource "aws_security_group" "allow_tls" {
-  name        = "allow_tls"
-  description = "Allow TLS inbound traffic"
-  vpc_id      = aws_vpc.main.id
+resource "aws_security_group" "summersSg" {
+  name        = "summersSg"
+  description = "Sec group for summers vpc"
+  vpc_id      = aws_vpc.summersVpc.id
 
   ingress {
-    description      = "TLS from VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = [aws_vpc.main.cidr_block]
-    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+    from_port        = 22
+    to_port          = 22
+    protocol         = "ssh"
+    cidr_blocks      = [var.MY_IP]
+
   }
 
   egress {
