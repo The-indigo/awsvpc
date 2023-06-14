@@ -39,3 +39,8 @@ variable "PRIVATE_KEY"{
 variable "MY_IP"{
     default = "174.94.0.224/32"
 }
+
+variable "subnet_ids" {
+  type    = list(string)
+  default = ["aws_subnet.summersPubSub1.id", "aws_subnet.summersPubSub2.id"]
+}
