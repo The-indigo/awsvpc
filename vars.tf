@@ -33,14 +33,14 @@ variable "UBUNTU_USER"{
 }
 
 variable "PRIVATE_KEY"{
-    default = "demoec2keypair"
+    default = "summerskey"
 }
 
 variable "MY_IP"{
     default = "174.94.0.224/32"
 }
 
-variable "subnet_ids" {
+variable "SUBNET_IDS" {
   type    = list(string)
   default = ["aws_subnet.summersPubSub1.id", "aws_subnet.summersPubSub2.id"]
 }

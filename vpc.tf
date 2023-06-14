@@ -109,7 +109,7 @@ resource "aws_route_table_association" "summersPrivSubAssoc1" {
   route_table_id = aws_route_table.summersPrivRouteTable.id
 }
 
-resource "aws_route_table_association" "summersPubSubAssoc2" {
+resource "aws_route_table_association" "summersPrivSubAssoc2" {
   subnet_id      = aws_subnet.summersPrivSub2.id
   route_table_id = aws_route_table.summersPrivRouteTable.id
 }
@@ -120,7 +120,7 @@ resource "aws_lb" "summersLb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.summersElbSg.id]
-  subnets            = [for subnet in aws_subnet.public : subnet.id]
+  subnets            = var.SUBNET_IDS
   enable_deletion_protection = false
 }
 
