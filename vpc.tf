@@ -9,8 +9,8 @@ resource "aws_vpc" "summersVpc" {
 
 
 resource "aws_subnet" "summersPubSub1" {
-  vpc_id     = aws_vpc.summersVpc.id
-  cidr_block = "172.22.1.0/24"
+  vpc_id            = aws_vpc.summersVpc.id
+  cidr_block        = "172.22.1.0/24"
   availability_zone = var.ZONE1
 
   tags = {
@@ -19,8 +19,8 @@ resource "aws_subnet" "summersPubSub1" {
 }
 
 resource "aws_subnet" "summersPubSub2" {
-  vpc_id     = aws_vpc.summersVpc.id
-  cidr_block = "172.22.2.0/24"
+  vpc_id            = aws_vpc.summersVpc.id
+  cidr_block        = "172.22.2.0/24"
   availability_zone = var.ZONE2
 
   tags = {
@@ -29,8 +29,8 @@ resource "aws_subnet" "summersPubSub2" {
 }
 
 resource "aws_subnet" "summersPrivSub1" {
-  vpc_id     = aws_vpc.summersVpc.id
-  cidr_block = "172.22.3.0/24"
+  vpc_id            = aws_vpc.summersVpc.id
+  cidr_block        = "172.22.3.0/24"
   availability_zone = var.ZONE1
   tags = {
     Name = "Private subnet 1 of 2"
@@ -38,8 +38,8 @@ resource "aws_subnet" "summersPrivSub1" {
 }
 
 resource "aws_subnet" "summersPrivSub2" {
-  vpc_id     = aws_vpc.summersVpc.id
-  cidr_block = "172.22.4.0/24"
+  vpc_id            = aws_vpc.summersVpc.id
+  cidr_block        = "172.22.4.0/24"
   availability_zone = var.ZONE2
 
   tags = {
@@ -76,8 +76,8 @@ resource "aws_route_table_association" "summersPubSubAssoc2" {
 }
 
 resource "aws_eip" "summersEip" {
-  domain   = "vpc"
-   depends_on = [aws_internet_gateway.summersVpcIG]
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.summersVpcIG]
 }
 
 
@@ -116,11 +116,11 @@ resource "aws_route_table_association" "summersPrivSubAssoc2" {
 
 
 resource "aws_lb" "summersLb" {
-  name               = "summersLb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.summersElbSg.id]
-  subnets            = var.SUBNET_IDS
+  name                       = "summersLb"
+  internal                   = false
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.summersElbSg.id]
+  subnets            = [aws_subnet.summersPubSub1.id,aws_subnet.summersPubSub2.id]
   enable_deletion_protection = false
 }
 
@@ -137,3 +137,13 @@ resource "aws_lb_target_group_attachment" "summersLbTgAttach" {
   port             = 80
 }
 
+
+resource "aws_lb_listener" "summersLbListener" {
+  load_balancer_arn = aws_lb.summersLb.arn
+  port              = "80"
+  protocol          = "HTTP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.summersLbTg.arn
+  }
+}
