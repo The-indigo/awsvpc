@@ -44,3 +44,20 @@ variable "SUBNET_IDS" {
   type    = list(string)
   default = ["aws_subnet.summersPubSub1.id", "aws_subnet.summersPubSub2.id"]
 }
+
+
+variable "PUBLIC_SUBNETS_CIDR"{
+  type        = list(any)
+  default = [ "172.22.1.0/24", "172.22.2.0/24" ]
+}
+
+variable "PRIVATE_SUBNETS_CIDR"{
+  type        = list(any)
+  default = [ "172.22.3.0/24", "172.22.4.0/24" ]
+}
+
+
+variable "PRIVATE_SUBNETS_ID"{
+  type        = list(any)
+  default = [ "summersPrivSub1", "summersPrivSub2" ]
+}

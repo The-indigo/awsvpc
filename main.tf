@@ -1,6 +1,8 @@
 resource "aws_vpc" "summersVpc" {
   cidr_block       = "172.22.0.0/16"
   instance_tenancy = "default"
+  enable_dns_support = true
+  enable_dns_hostnames = true
 
   tags = {
     Name = "Vpc 1"
@@ -12,7 +14,7 @@ resource "aws_subnet" "summersPubSub1" {
   vpc_id            = aws_vpc.summersVpc.id
   cidr_block        = "172.22.1.0/24"
   availability_zone = var.ZONE1
-
+  map_public_ip_on_launch = true 
   tags = {
     Name = "Public subnet 1 of 2"
   }
@@ -22,6 +24,7 @@ resource "aws_subnet" "summersPubSub2" {
   vpc_id            = aws_vpc.summersVpc.id
   cidr_block        = "172.22.2.0/24"
   availability_zone = var.ZONE2
+  map_public_ip_on_launch = true 
 
   tags = {
     Name = "Public subnet 2 of 2"
@@ -60,7 +63,7 @@ resource "aws_route_table" "summersPubRouteTable" {
   }
 
   tags = {
-    Name = "Summers public subnet route table"
+    Name = "Summers internet access route table"
   }
 }
 
@@ -77,7 +80,7 @@ resource "aws_route_table_association" "summersPubSubAssoc2" {
 
 resource "aws_eip" "summersEip" {
   domain     = "vpc"
-  depends_on = [aws_internet_gateway.summersVpcIG]
+  # depends_on = [aws_internet_gateway.summersVpcIG]
 }
 
 
@@ -96,7 +99,7 @@ resource "aws_route_table" "summersPrivRouteTable" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.summersNg.id
+    nat_gateway_id = aws_nat_gateway.summersNg.id
   }
 
   tags = {
@@ -129,13 +132,25 @@ resource "aws_lb_target_group" "summersLbTg" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.summersVpc.id
+    health_check {
+    enabled             = true
+    healthy_threshold   = 3
+    interval            = 10
+    matcher             = "200,202"
+    port                = 80
+    path                = "/"
+    protocol            = "HTTP"
+    timeout             = 60
+    unhealthy_threshold = 2
+  }
 }
 
-resource "aws_lb_target_group_attachment" "summersLbTgAttach" {
-  target_group_arn = aws_lb_target_group.summersLbTg.arn
-  target_id        = aws_instance.summersBastionHost.id
-  port             = 80
-}
+# resource "aws_lb_target_group_attachment" "summersLbTgAttach" {
+#   count = length(aws_instance.summerswebserver)
+#   target_group_arn = aws_lb_target_group.summersLbTg.arn
+#   target_id        = element(aws_instance.summerswebserver.*.id, count.index)
+#   port             = 80
+# }
 
 
 resource "aws_lb_listener" "summersLbListener" {

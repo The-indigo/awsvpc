@@ -4,11 +4,18 @@ resource "aws_security_group" "summersSg" {
   vpc_id      = aws_vpc.summersVpc.id
 
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [var.MY_IP]
+    cidr_blocks = ["0.0.0.0/0"]
 
+  }
+
+    ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
