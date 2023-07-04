@@ -80,7 +80,7 @@ resource "aws_route_table_association" "summersPubSubAssoc2" {
 
 resource "aws_eip" "summersEip" {
   domain     = "vpc"
-  # depends_on = [aws_internet_gateway.summersVpcIG]
+  depends_on = [aws_internet_gateway.summersVpcIG]
 }
 
 
@@ -144,13 +144,6 @@ resource "aws_lb_target_group" "summersLbTg" {
     unhealthy_threshold = 2
   }
 }
-
-# resource "aws_lb_target_group_attachment" "summersLbTgAttach" {
-#   count = length(aws_instance.summerswebserver)
-#   target_group_arn = aws_lb_target_group.summersLbTg.arn
-#   target_id        = element(aws_instance.summerswebserver.*.id, count.index)
-#   port             = 80
-# }
 
 
 resource "aws_lb_listener" "summersLbListener" {
