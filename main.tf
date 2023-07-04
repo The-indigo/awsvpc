@@ -135,16 +135,21 @@ resource "aws_lb_target_group" "summersLbTg" {
     health_check {
     enabled             = true
     healthy_threshold   = 3
-    interval            = 10
+    interval            = 70
     matcher             = "200,202"
     port                = 80
     path                = "/"
     protocol            = "HTTP"
-    timeout             = 60
+    timeout             = 40
     unhealthy_threshold = 2
   }
 }
 
+resource "aws_lb_target_group_attachment" "summersTgAttachment" {
+  target_group_arn = aws_lb_target_group.summersLbTg.arn
+  target_id        = aws_instance.summerswebserver.id
+  port             = 80
+}
 
 resource "aws_lb_listener" "summersLbListener" {
   load_balancer_arn = aws_lb.summersLb.arn
